@@ -7,13 +7,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-import time
-
-FACULTY_LIST_URL = "https://math.illinois.edu/directory/faculty"
-
-# selector for all divs which directly contain the name of a faculty member
-CSS_SELECTOR = ".field-name-field-dircore-display-name .field__item"
-
 MATHSCINET_AUTHOR_SEARCH_URL = "https://mathscinet-ams-org.proxy2.library.illinois.edu/mathscinet/searchauthors.html"
 
 # the two lines below are from here:
@@ -22,11 +15,8 @@ service = Service(executable_path=ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service)
 wait = WebDriverWait(driver, 60)
 
-driver.get(FACULTY_LIST_URL)
-
-divs_containing_names = driver.find_elements(By.CSS_SELECTOR, CSS_SELECTOR)
-names = [div.text for div in divs_containing_names]
-print(names)
+with open("names.txt", "r") as f:
+    names = f.read().splitlines()
 
 with open("output.txt", "w") as outfile:
     for name in names:
