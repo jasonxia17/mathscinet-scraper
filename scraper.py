@@ -28,6 +28,7 @@ with open("names.txt", "r") as f:
 df = []
 
 for name in names:
+    print(name)
     driver.get(MATHSCINET_AUTHOR_SEARCH_URL)
 
     # wait up to 60 seconds for the user to log in
@@ -44,8 +45,8 @@ for name in names:
         continue
 
     table_cells = driver.find_elements(By.TAG_NAME, "td")
-    total_citations = None
-    total_publications = None
+    total_citations = 0
+    total_publications = 0
 
     for prev_cell, curr_cell in zip(table_cells[:-1], table_cells[1:]):
         if prev_cell.text == "Total Publications:":
