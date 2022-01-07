@@ -73,26 +73,35 @@ for name in names:
         # Results already fit on a single page, we don't need to do anything
         pass
 
-    publications_in_date_range = driver.find_element(By.CLASS_NAME, 'matches').text.split()[1]
+    try:
+        # Only one publication matches, so we're on a publication page instead of search results page
+        citations_in_date_range = driver.find_element(By.CSS_SELECTOR, ".citationCounts p").text.split(": ")[1]
+        publications_in_date_range = 1
 
-    citations_in_date_range = 0
+    except NoSuchElementException:
+        try:
+            publications_in_date_range = driver.find_element(By.CLASS_NAME, 'matches').text.split()[1]
+        except NoSuchElementException:
+            publications_in_date_range = 0
 
-    while True:
-        for a in driver.find_elements(By.CSS_SELECTOR, '.headlineMenu a'):
-            if "Citation" in a.text:
-                citations_in_date_range += int(a.text.split()[0])
+        citations_in_date_range = 0
 
-        nav_links = driver.find_elements(By.CSS_SELECTOR, '.navbar a')
-        if not nav_links or nav_links[-1].text != "Next":
-            break
+        while True:
+            for a in driver.find_elements(By.CSS_SELECTOR, '.headlineMenu a'):
+                if "Citation" in a.text:
+                    citations_in_date_range += int(a.text.split()[0])
 
-        # Keep clicking "Next" while it is clickable
-        # Still need to do this because when there are >100 results, "Show all results" is not
-        # an option; it can only display 100 results at a time.
-        nav_links[-1].click()
+            nav_links = driver.find_elements(By.CSS_SELECTOR, '.navbar a')
+            if not nav_links or nav_links[-1].text != "Next":
+                break
+
+            # Keep clicking "Next" while it is clickable
+            # Still need to do this because when there are >100 results, "Show all results" is not
+            # an option; it can only display 100 results at a time.
+            nav_links[-1].click()
 
     df.append([name, int(total_publications), int(total_citations),
-               int(publications_in_date_range), citations_in_date_range])
+               int(publications_in_date_range), int(citations_in_date_range)])
 
 df = pd.DataFrame(df, columns=["Name", "Total Publications", "Total Citations",
                               "Publications in Date Range", "Citations in Date Range"])
